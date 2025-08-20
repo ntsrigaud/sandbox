@@ -300,3 +300,32 @@ TEST(MyDBTest, LoginTestDefaultBehavior) {
 ```
 
 ## Performing Multiple Actions
+
+We can perform multiple actions by calling `DoAll()` on an `EXPECT_CALL` statement.
+
+> [!IMPORTANT]
+> `DoAll()` takes an arbitrary number of parameters, but **only** the last parameter will return a value.
+
+```C++
+TEST(MyDBTest, LoginTestMultipleActions) {
+  // Arrange
+  MockDB mdb; // Tell the behavior of the class
+  MyDatabase db(mdb);
+  testOtherImplementation dbTest;
+
+  // Setup the mock behaviour
+  EXPECT_CALL(mdb, login(_, _))
+      .Times(AtLeast(1))
+      .WillOnce(DoAll(Invoke(&dbTest, &testOtherImplementation::dummyLogin),
+                      Invoke(&dbTest, &testOtherImplementation::dummyLogin),
+                      Invoke(&dbTest, &testOtherImplementation::dummyLogin),
+                      Invoke(&dbTest, &testOtherImplementation::dummyLogin),
+                      Return(true)));
+
+  // Act
+  int retValue = db.Init("John Doe", "sample password");
+
+  // Assert
+  EXPECT_EQ(retValue, SUCCESS);
+};
+```
