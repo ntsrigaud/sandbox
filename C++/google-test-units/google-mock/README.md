@@ -174,6 +174,31 @@ TEST(MyDBTest, LoginTest) {
 
 ## Invoking Original and Other Implementations
 
+In some cases, we might want to ensure that a `MOCK_METHOD` calls a particular member function _from a derived class_. This can be done by `using ::testing::Invoke`.
+
+### Invoking Original Implementation
+
+```C++
+TEST(MyDBTest, LoginTest) {
+  // Arrange
+  MockDB mdb; // Tell the behavior of the class
+  MyDatabase db(mdb);
+  DatabaseConnect dbTest;
+
+  // Setup the mock behaviour
+  EXPECT_CALL(mdb, login(_, _))
+      .Times(AtLeast(1))
+      .WillOnce(Invoke(&dbTest, &DatabaseConnect::login));
+
+  // Act
+  int retValue = db.Init("John Doe", "sample password");
+
+  // Assert
+  EXPECT_EQ(retValue, SUCCESS);
+};
+
+```
+
 ## Setting Default Actions
 
 ## Performing Multiple Actions

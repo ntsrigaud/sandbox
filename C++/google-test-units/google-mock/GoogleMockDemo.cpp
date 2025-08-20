@@ -15,11 +15,13 @@ constexpr int LOGIN_ATTEMPTS = 2;
 
 using ::testing::_;
 using ::testing::AtLeast;
+using ::testing::Invoke;
 using ::testing::Return;
 
 class DatabaseConnect {
 public:
   virtual bool login(std::string username, std::string password) {
+    LOG("CALLING ORIGINAL LOGIN...");
     UNUSED(username);
     UNUSED(password);
     return true;
@@ -68,6 +70,24 @@ public:
     //  return dbC.login2(username, password);
     //}
   };
+};
+
+TEST(MyDBTest, LoginTest) {
+  // Arrange
+  MockDB mdb; // Tell the behavior of the class
+  MyDatabase db(mdb);
+  DatabaseConnect dbTest;
+
+  // Setup the mock behaviour
+  EXPECT_CALL(mdb, login(_, _))
+      .Times(AtLeast(1))
+      .WillOnce(Invoke(&dbTest, &DatabaseConnect::login));
+
+  // Act
+  int retValue = db.Init("John Doe", "sample password");
+
+  // Assert
+  EXPECT_EQ(retValue, SUCCESS);
 };
 
 // TEST(MyDBTest, LoginSuccess) {
