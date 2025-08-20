@@ -17,26 +17,26 @@ using ::testing::_;
 using ::testing::AtLeast;
 using ::testing::Return;
 
-// class DatabaseConnect {
-// public:
-//   virtual bool login(std::string username, std::string password) {
-//     UNUSED(username);
-//     UNUSED(password);
-//     return true;
-//   };
-//   virtual bool login2(std::string username, std::string password) {
-//     UNUSED(username);
-//     UNUSED(password);
-//     return true;
-//   };
-//   virtual bool logout(std::string username) {
-//     UNUSED(username);
-//     return true;
-//   };
-//   virtual int fetchRecord() { return -1; };
-// };
-
 class DatabaseConnect {
+public:
+  virtual bool login(std::string username, std::string password) {
+    UNUSED(username);
+    UNUSED(password);
+    return true;
+  };
+  virtual bool login2(std::string username, std::string password) {
+    UNUSED(username);
+    UNUSED(password);
+    return true;
+  };
+  virtual bool logout(std::string username) {
+    UNUSED(username);
+    return true;
+  };
+  virtual int fetchRecord() { return -1; };
+};
+
+class MockDB : public DatabaseConnect {
 public:
   MOCK_METHOD0(fetchRecord, int());
   MOCK_METHOD1(logout, bool(std::string));
@@ -52,27 +52,27 @@ public:
 
   int Init(std::string username, std::string password) {
     // Randomly chose the login method
-    int rvalue = rand() % 2;
+    // int rvalue = rand() % 2;
 
-    if (rvalue == 0) {
-      if (!dbC.login(username, password)) {
-        // Try two successive login attempt
-        if (!dbC.login(username, password))
-          LOG("DB FAILURE 2nd TIME");
-        return FAILURE;
-      } else {
-        LOG("DB SUCCESS");
-        return SUCCESS;
-      }
+    // if (rvalue == 0) {
+    if (!dbC.login(username, password)) {
+      // Try two successive login attempt
+      if (!dbC.login(username, password))
+        LOG("DB FAILURE 2nd TIME");
+      return FAILURE;
     } else {
-      return dbC.login2(username, password);
+      LOG("DB SUCCESS");
+      return SUCCESS;
     }
+    //} else {
+    //  return dbC.login2(username, password);
+    //}
   };
 };
 
 // TEST(MyDBTest, LoginSuccess) {
 //   // Arrange
-//   DatabaseConnect mdb; // Tell the behavior of the class
+//   Mock mdb; // Tell the behavior of the class
 //   MyDatabase db(mdb);
 //
 //   // Setup the mock behaviour
@@ -89,7 +89,7 @@ public:
 
 // TEST(MyDBTest, LoginFailureExpectCall) {
 //   // Arrange
-//   DatabaseConnect mdb; // Tell the behavior of the class
+//   MockDB mdb; // Tell the behavior of the class
 //   MyDatabase db(mdb);
 //
 //   // Setup the mock behaviour
@@ -106,7 +106,7 @@ public:
 
 TEST(MyDBTest, LoginFailureOnCall) {
   // Arrange
-  DatabaseConnect mdb; // Tell the behavior of the class
+  MockDB mdb; // Tell the behavior of the class
   MyDatabase db(mdb);
 
   // Setup the mock behaviour
@@ -121,7 +121,7 @@ TEST(MyDBTest, LoginFailureOnCall) {
 
 TEST(MyDBTest, LoginSuccessOnCallWithRandomlyChosenFunction) {
   // Arrange
-  DatabaseConnect mdb; // Tell the behavior of the class
+  MockDB mdb; // Tell the behavior of the class
   MyDatabase db(mdb);
 
   // Setup the mock behaviour
