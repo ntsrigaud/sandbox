@@ -199,6 +199,46 @@ TEST(MyDBTest, LoginTest) {
 
 ```
 
+### Invoking Other Implementations
+
+> [!NOTE]
+> Invoking other implementations can be used when you are creating some supporting steps for the mock.
+
+#### Invoking a Function Inside a `struct` Or a `class`
+
+> [!NOTE]
+> `Invoke()` can call anything, it is not a requirement for the given instance parameter type to be the derived class.
+
+```C++
+struct testOriginalImplementation {
+  bool dummyLogin(std::string u, std::string p) {
+    LOG("CALLING DUMMY LOGIN...");
+    UNUSED(u);
+    UNUSED(p);
+    return true;
+  };
+};
+
+TEST(MyDBTest, LoginTest) {
+  // Arrange
+  MockDB mdb; // Tell the behavior of the class
+  MyDatabase db(mdb);
+  testOriginalImplementation dbTest;
+
+  // Setup the mock behaviour
+  EXPECT_CALL(mdb, login(_, _))
+      .Times(AtLeast(1))
+      .WillOnce(Invoke(&dbTest, &testOriginalImplementation::dummyLogin));
+
+  // Act
+  int retValue = db.Init("John Doe", "sample password");
+
+  // Assert
+  EXPECT_EQ(retValue, SUCCESS);
+};
+
+```
+
 ## Setting Default Actions
 
 ## Performing Multiple Actions
