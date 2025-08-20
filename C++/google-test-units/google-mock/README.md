@@ -239,6 +239,38 @@ TEST(MyDBTest, LoginTest) {
 
 ```
 
+#### Invoking a Function Outside a `struct` Or a `class`
+
+This can be done by `using ::testing::InvokeWithoutArgs`.
+
+> [!IMPORTANT]
+> If you want to call a `global` function, it **has** to be without any argument.
+
+```C++
+bool globalDummyFn() {
+    LOG("CALLING GLOBAL DUMMY FUNCTION...");
+    return true;
+};
+
+TEST(MyDBTest, GlobalDummyFn) {
+  // Arrange
+  MockDB mdb; // Tell the behavior of the class
+  MyDatabase db(mdb);
+
+  // Setup the mock behaviour
+  EXPECT_CALL(mdb, login(_, _))
+      .Times(AtLeast(1))
+      .WillOnce(InvokeWithoutArgs(globalDummyFn));
+
+  // Act
+  int retValue = db.Init("John Doe", "sample password");
+
+  // Assert
+  EXPECT_EQ(retValue, SUCCESS);
+};
+
+```
+
 ## Setting Default Actions
 
 ## Performing Multiple Actions

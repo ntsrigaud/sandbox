@@ -16,6 +16,7 @@ constexpr int LOGIN_ATTEMPTS = 2;
 using ::testing::_;
 using ::testing::AtLeast;
 using ::testing::Invoke;
+using ::testing::InvokeWithoutArgs;
 using ::testing::Return;
 
 class DatabaseConnect {
@@ -92,6 +93,28 @@ TEST(MyDBTest, LoginTest) {
   EXPECT_CALL(mdb, login(_, _))
       .Times(AtLeast(1))
       .WillOnce(Invoke(&dbTest, &testOtherImplementation::dummyLogin));
+
+  // Act
+  int retValue = db.Init("John Doe", "sample password");
+
+  // Assert
+  EXPECT_EQ(retValue, SUCCESS);
+};
+
+bool globalDummyFn() {
+  LOG("CALLING GLOBAL DUMMY FUNCTION...");
+  return true;
+};
+
+TEST(MyDBTest, GlobalDummyFn) {
+  // Arrange
+  MockDB mdb; // Tell the behavior of the class
+  MyDatabase db(mdb);
+
+  // Setup the mock behaviour
+  EXPECT_CALL(mdb, login(_, _))
+      .Times(AtLeast(1))
+      .WillOnce(InvokeWithoutArgs(globalDummyFn));
 
   // Act
   int retValue = db.Init("John Doe", "sample password");
