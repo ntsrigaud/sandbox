@@ -271,6 +271,32 @@ TEST(MyDBTest, GlobalDummyFn) {
 
 ```
 
-## Setting Default Actions
+## Setting Default Actions for Function Calls
+
+In some situations, you might need that `EXPECT_CALL` executes multiple times, maybe to verify multiple conditions. A simple solution to this problem is to set the `Invoke()` statement in a particular place and it should be called _by default_ whenever `EXPECT_CALL` executes.
+
+We can do this by using `ON_CALL` to set up the default behaviour and use `DoDefault` as argument for the `EXPECT_CALL` whenever it executes as it follows:
+
+```C++
+TEST(MyDBTest, LoginTestDefaultBehavior) {
+  // Arrange
+  MockDB mdb; // Tell the behavior of the class
+  MyDatabase db(mdb);
+  testOtherImplementation dbTest;
+
+  // Setup the mock behaviour
+  ON_CALL(mdb, login(_, _)).WillByDefault(Invoke(&dbTest, &testOtherImplementation::dummyLogin));
+  EXPECT_CALL(mdb, login(_, _))
+      .Times(AtLeast(1))
+      .WillOnce(DoDefault());
+
+  // Act
+  int retValue = db.Init("John Doe", "sample password");
+
+  // Assert
+  EXPECT_EQ(retValue, SUCCESS);
+};
+
+```
 
 ## Performing Multiple Actions

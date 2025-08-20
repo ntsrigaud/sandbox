@@ -15,6 +15,7 @@ constexpr int LOGIN_ATTEMPTS = 2;
 
 using ::testing::_;
 using ::testing::AtLeast;
+using ::testing::DoDefault;
 using ::testing::Invoke;
 using ::testing::InvokeWithoutArgs;
 using ::testing::Return;
@@ -115,6 +116,25 @@ TEST(MyDBTest, GlobalDummyFn) {
   EXPECT_CALL(mdb, login(_, _))
       .Times(AtLeast(1))
       .WillOnce(InvokeWithoutArgs(globalDummyFn));
+
+  // Act
+  int retValue = db.Init("John Doe", "sample password");
+
+  // Assert
+  EXPECT_EQ(retValue, SUCCESS);
+};
+
+// Set login function default action
+TEST(MyDBTest, LoginTestDefaultBehavior) {
+  // Arrange
+  MockDB mdb; // Tell the behavior of the class
+  MyDatabase db(mdb);
+  testOtherImplementation dbTest;
+
+  // Setup the mock behaviour
+  ON_CALL(mdb, login(_, _))
+      .WillByDefault(Invoke(&dbTest, &testOtherImplementation::dummyLogin));
+  EXPECT_CALL(mdb, login(_, _)).Times(AtLeast(1)).WillOnce(DoDefault());
 
   // Act
   int retValue = db.Init("John Doe", "sample password");
