@@ -15,11 +15,16 @@ constexpr int LOGIN_ATTEMPTS = 2;
 
 using ::testing::_;
 using ::testing::AtLeast;
+using ::testing::DoAll;
+using ::testing::DoDefault;
+using ::testing::Invoke;
+using ::testing::InvokeWithoutArgs;
 using ::testing::Return;
 
 class DatabaseConnect {
 public:
   virtual bool login(std::string username, std::string password) {
+    LOG("CALLING ORIGINAL LOGIN...");
     UNUSED(username);
     UNUSED(password);
     return true;
@@ -52,27 +57,119 @@ public:
 
   int Init(std::string username, std::string password) {
     // Randomly chose the login method
-    int rvalue = rand() % 2;
+    // int rvalue = rand() % 2;
 
-    if (rvalue == 0) {
-      if (!dbC.login(username, password)) {
-        // Try two successive login attempt
-        if (!dbC.login(username, password))
-          LOG("DB FAILURE 2nd TIME");
-        return FAILURE;
-      } else {
-        LOG("DB SUCCESS");
-        return SUCCESS;
-      }
+    // if (rvalue == 0) {
+    if (!dbC.login(username, password)) {
+      // Try two successive login attempt
+      if (!dbC.login(username, password))
+        LOG("DB FAILURE 2nd TIME");
+      return FAILURE;
     } else {
-      return dbC.login2(username, password);
+      LOG("DB SUCCESS");
+      return SUCCESS;
     }
+    //} else {
+    //  return dbC.login2(username, password);
+    //}
   };
+};
+
+// Using other implementations with Invoke()
+struct testOtherImplementation {
+  bool dummyLogin(std::string u, std::string p) {
+    LOG("CALLING DUMMY LOGIN...");
+    UNUSED(u);
+    UNUSED(p);
+    return true;
+  };
+};
+
+TEST(MyDBTest, LoginTest) {
+  // Arrange
+  MockDB mdb; // Tell the behavior of the class
+  MyDatabase db(mdb);
+  testOtherImplementation dbTest;
+
+  // Setup the mock behaviour
+  EXPECT_CALL(mdb, login(_, _))
+      .Times(AtLeast(1))
+      .WillOnce(Invoke(&dbTest, &testOtherImplementation::dummyLogin));
+
+  // Act
+  int retValue = db.Init("John Doe", "sample password");
+
+  // Assert
+  EXPECT_EQ(retValue, SUCCESS);
+};
+
+bool globalDummyFn() {
+  LOG("CALLING GLOBAL DUMMY FUNCTION...");
+  return true;
+};
+
+TEST(MyDBTest, GlobalDummyFn) {
+  // Arrange
+  MockDB mdb; // Tell the behavior of the class
+  MyDatabase db(mdb);
+
+  // Setup the mock behaviour
+  EXPECT_CALL(mdb, login(_, _))
+      .Times(AtLeast(1))
+      .WillOnce(InvokeWithoutArgs(globalDummyFn));
+
+  // Act
+  int retValue = db.Init("John Doe", "sample password");
+
+  // Assert
+  EXPECT_EQ(retValue, SUCCESS);
+};
+
+// Set login function default action
+TEST(MyDBTest, LoginTestDefaultBehavior) {
+  // Arrange
+  MockDB mdb; // Tell the behavior of the class
+  MyDatabase db(mdb);
+  testOtherImplementation dbTest;
+
+  // Setup the mock behaviour
+  ON_CALL(mdb, login(_, _))
+      .WillByDefault(Invoke(&dbTest, &testOtherImplementation::dummyLogin));
+  EXPECT_CALL(mdb, login(_, _)).Times(AtLeast(1)).WillOnce(DoDefault());
+
+  // Act
+  int retValue = db.Init("John Doe", "sample password");
+
+  // Assert
+  EXPECT_EQ(retValue, SUCCESS);
+};
+
+// Performing multiple actions
+TEST(MyDBTest, LoginTestMultipleActions) {
+  // Arrange
+  MockDB mdb; // Tell the behavior of the class
+  MyDatabase db(mdb);
+  testOtherImplementation dbTest;
+
+  // Setup the mock behaviour
+  EXPECT_CALL(mdb, login(_, _))
+      .Times(AtLeast(1))
+      .WillOnce(DoAll(Invoke(&dbTest, &testOtherImplementation::dummyLogin),
+                      Invoke(&dbTest, &testOtherImplementation::dummyLogin),
+                      Invoke(&dbTest, &testOtherImplementation::dummyLogin),
+                      Invoke(&dbTest, &testOtherImplementation::dummyLogin),
+                      Return(true)));
+
+  // Act
+  int retValue = db.Init("John Doe", "sample password");
+
+  // Assert
+  EXPECT_EQ(retValue, SUCCESS);
 };
 
 // TEST(MyDBTest, LoginSuccess) {
 //   // Arrange
-//   MockDB mdb; // Tell the behavior of the class
+//   Mock mdb; // Tell the behavior of the class
 //   MyDatabase db(mdb);
 //
 //   // Setup the mock behaviour
