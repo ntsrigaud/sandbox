@@ -10,16 +10,16 @@ Google Test is a testing framework for writing unit tests in C++. The structure 
 
 ## Writing a Unit Test
 
-Unit test are written using a _macro_ (`TEST`, `TEST_F`, ...etc.) where we can specify the **test name**, and the **subtest name** as argument to the macro.
+Unit test are written using a _macro_ (`TEST`, `TEST_F`, ...etc.) where we can specify the **test suite name**, and the **test name** as argument to the macro.
 
 ```C++
-TEST(TEST_NAME, SUB_TEST_NAME) {
+TEST(TEST_SUITE_NAME, TEST_NAME) {
     std::cout << "This is a sample test unit\n";
 }
 ```
 
 > [!IMPORTANT]
-> A **subtest name** can be used only once in a test unit.
+> A **test name** can be used only once in a test suite.
 
 ### Assertions
 
