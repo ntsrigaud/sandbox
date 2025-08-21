@@ -1,5 +1,4 @@
 // GoogleTestDemo.cpp
-#include "gtest/gtest.h"
 #include <gtest/gtest.h>
 #include <ostream>
 #include <stdexcept>
