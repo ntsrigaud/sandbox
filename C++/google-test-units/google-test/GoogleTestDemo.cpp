@@ -13,7 +13,7 @@ struct BankAccount {
   explicit BankAccount(const int bal) : balance{bal} {};
   void deposit(int amount) {
     if (amount <= 0) {
-      throw std::invalid_argument("deposing negative or no amount");
+      throw std::invalid_argument("depositing negative or no amount");
     }
 
     balance += amount;
