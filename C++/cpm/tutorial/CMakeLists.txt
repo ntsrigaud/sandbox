@@ -26,3 +26,6 @@ CPMAddPackage(
   GITHUB_REPOSITORY gabime/spdlog
   VERSION 1.7.0
 )
+
+# Link the library to the project
+target_link_libraries(cpm_example spdlog)
