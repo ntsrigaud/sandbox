@@ -5,11 +5,6 @@ project(cpm_example LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# ---- Main executable ----
-add_executable(cpm_example
-    src/main.cpp
-)
-
 set(CPM_DOWNLOAD_VERSION 0.27.2)
 set(CPM_DOWNLOAD_LOCATION "${CMAKE_BINARY_DIR}/cmake/CPM_${CPM_DOWNLOAD_VERSION}.cmake")
 
@@ -26,6 +21,9 @@ CPMAddPackage(
   GITHUB_REPOSITORY gabime/spdlog
   VERSION 1.7.0
 )
+
+# ---- Main executable ----
+add_executable(cpm_example src/main.cpp)
 
 # Link the library to the project
 target_link_libraries(cpm_example spdlog)
