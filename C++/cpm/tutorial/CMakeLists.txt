@@ -19,3 +19,10 @@ if (NOT (EXISTS ${CPM_DOWNLOAD_LOCATION}))
 endif()
 
 include(${CPM_DOWNLOAD_LOCATION})
+
+# Implement spdlog to the project
+CPMAddPackage(
+  NAME spdlog
+  GITHUB_REPOSITORY gabime/spdlog
+  VERSION 1.7.0
+)
