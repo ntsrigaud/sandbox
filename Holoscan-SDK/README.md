@@ -20,7 +20,7 @@ Start by logging into the NGC docker registry:
 docker login nvcr.io
 ```
 
-If successfull, you will observe the follwing log output:
+If successful, you will observe the following log output:
 
 ```console
 Authenticating with existing credentials... [Username: $oauthtoken]
