@@ -83,7 +83,7 @@ find_package(holoscan REQUIRED CONFIG PATHS "/opt/nvidia/holoscan")
 target_link_libraries(yourTarget PUBLIC holoscan::core)
 ```
 
-[Additional CMake configuration informations](https://cmake.org/cmake/help/v3.22/command/find_package.html#config-mode-search-procedure)
+[Additional CMake configuration information](https://cmake.org/cmake/help/v3.22/command/find_package.html#config-mode-search-procedure)
 
 ### Examples
 
