@@ -1,0 +1,16 @@
+services:
+  mnist-training:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mnist_pytorch_test
+    volumes:
+      - .:/workspace
+    shm_size: '16gb' # Crucial for PyTorch Dataloaders to prevent shared memory crashes
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all # Use all available GPUs
+              capabilities: [gpu]
