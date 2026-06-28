@@ -4,7 +4,7 @@ FROM nvcr.io/nvidia/tensorflow:25.02-tf2-py3
 WORKDIR /workspace
 
 # Install JupyterLab and visualization tools
-RUN pip install --no-cache-dire jupyterlab matplotlib
+RUN pip install --no-cache-dir jupyterlab matplotlib
 
 # Expose the default Jupyter port inside the container
 EXPOSE 8888
