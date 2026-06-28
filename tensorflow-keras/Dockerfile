@@ -1,4 +1,4 @@
-FROM nvcr.io/nvidia/tensorflow:25.02-tf2-py3-igpu
+FROM nvcr.io/nvidia/tensorflow:25.02-tf2-py3
 
 # Set the working directory inside the container
 WORKDIR /workspace
